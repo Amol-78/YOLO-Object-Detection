@@ -1,0 +1,12 @@
+flask==2.3.3
+flask-cors==4.0.0
+opencv-python==4.8.1.78
+numpy==1.24.3
+torch==2.0.1
+torchvision==0.15.2
+ultralytics==8.0.186
+werkzeug==2.3.7
+pillow==10.0.0
+gunicorn==21.2.0
+python-multipart==0.0.6
+imageio[ffmpeg]==2.37.2

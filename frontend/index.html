@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLO Object Detection</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-robot"></i> YOLO Object Detection</h1>
+            <p>Real-time object detection using YOLO models</p>
+        </header>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <button class="control-btn" id="inputTypeBtn">
+                <i class="fas fa-folder-open"></i> Input Type
+            </button>
+            <button class="control-btn" id="modelSettingsBtn">
+                <i class="fas fa-cog"></i> Model Settings
+            </button>
+            <button class="control-btn" id="detectionSettingsBtn">
+                <i class="fas fa-palette"></i> Detection Settings
+            </button>
+            <button class="control-btn" id="objectFilterBtn">
+                <i class="fas fa-filter"></i> Object Filter
+            </button>
+            <button class="control-btn" id="audioAlertBtn">
+                <i class="fas fa-volume-up"></i> Audio Alert
+            </button>
+        </div>
+
+        <!-- Dialog Overlay -->
+        <div id="dialogOverlay" class="dialog-overlay hidden">
+            <div class="dialog-box">
+                <div class="dialog-header">
+                    <h2 id="dialogTitle">Dialog Title</h2>
+                    <button class="close-btn" id="closeDialog">&times;</button>
+                </div>
+                <div class="dialog-content" id="dialogContent">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Current Mode Display -->
+            <div class="mode-display">
+                <h3>Current Mode: <span id="currentMode">Upload Image</span></h3>
+            </div>
+
+            <!-- Input Sections -->
+            <div class="input-section" id="imageSection">
+                <div class="upload-area" id="imageUploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Upload Image</h3>
+                    <p>Drag & drop or click to select an image</p>
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+                    <button class="btn-primary" onclick="document.getElementById('imageInput').click()">
+                        Select Image
+                    </button>
+                </div>
+                
+                <div class="preview-area hidden" id="imagePreview">
+                    <div class="preview-header">
+                        <h3>Image Preview</h3>
+                        <button class="btn-secondary" onclick="clearImagePreview()">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                    <div class="preview-content">
+                        <img id="previewImage" src="" alt="Preview">
+                    </div>
+                    <button class="btn-primary" id="detectImageBtn">
+                        <i class="fas fa-search"></i> Detect Objects
+                    </button>
+                </div>
+            </div>
+
+            <div class="input-section hidden" id="videoSection">
+                <div class="upload-area" id="videoUploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Upload Video</h3>
+                    <p>Drag & drop or click to select a video</p>
+                    <input type="file" id="videoInput" accept="video/*" hidden>
+                    <button class="btn-primary" onclick="document.getElementById('videoInput').click()">
+                        Select Video
+                    </button>
+                </div>
+                
+                <div class="preview-area hidden" id="videoPreview">
+                    <div class="preview-header">
+                        <h3>Real-Time Live Video Tracking</h3>
+                        <button class="btn-secondary" onclick="clearVideoPreview()">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                    <div class="preview-content" style="position: relative; max-width: 100%; display: inline-block;">
+                        <video id="previewVideo" controls autoplay style="max-width: 100%; display: block; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"></video>
+                        <canvas id="videoCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+                        
+                        <div id="liveStatsOverlay" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-family: sans-serif; display: none;">
+                            Tracking: <span id="liveUniqueCount">0</span> Unique Objects
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-section hidden" id="webcamSection">
+                <div class="webcam-controls">
+                    <h3>Live Webcam Detection</h3>
+                    <div class="control-buttons">
+                        <button class="btn-primary" id="startWebcamBtn">
+                            <i class="fas fa-camera"></i> Start Webcam
+                        </button>
+                        <button class="btn-secondary" id="stopWebcamBtn" disabled>
+                            <i class="fas fa-stop"></i> Stop Webcam
+                        </button>
+                    </div>
+                    <div class="webcam-feed">
+                        <video id="webcamVideo" autoplay muted></video>
+                        <canvas id="webcamCanvas" class="hidden"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="results-section hidden">
+                <div class="results-header">
+                    <h3><i class="fas fa-chart-bar"></i> Detection Results</h3>
+                    <div class="results-stats">
+                        <span id="detectionCount">0 objects detected</span>
+                        <button class="btn-secondary" id="downloadBtn">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="results-content">
+                    <div class="original-preview">
+                        <h4>Original</h4>
+                        <div id="originalContainer"></div>
+                    </div>
+                    <div class="detected-preview">
+                        <h4>Detected Objects</h4>
+                        <div id="detectedContainer"></div>
+                    </div>
+                </div>
+                
+                <div class="detections-list">
+                    <h4>Detected Objects List</h4>
+                    <div id="detectionsList"></div>
+                </div>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div id="loadingOverlay" class="loading-overlay hidden">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Processing...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="scripts/script.js"></script>
+</body>
+</html>
