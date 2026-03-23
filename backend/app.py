@@ -92,6 +92,21 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.route("/")
+def home():
+    return """
+    <h2>🚀 YOLO Object Detection API is Running</h2>
+    <p>Available Endpoints:</p>
+    <ul>
+        <li>/api/health</li>
+        <li>/api/status</li>
+        <li>/api/models</li>
+        <li>/api/detect/image</li>
+        <li>/api/detect/video</li>
+        <li>/api/detect/webcam</li>
+    </ul>
+    """
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({
@@ -469,5 +484,9 @@ if __name__ == '__main__':
         print("   3. Place them in the backend directory")
     else:
         print("\n Ready for object detection!")
-    
-    app.run(host='0.0.0.0', port=5000, debug=True)
+
+    # ✅ IMPORTANT FIX FOR RENDER
+    import os
+    port = int(os.environ.get("PORT", 10000))
+
+    app.run(host='0.0.0.0', port=port)
