@@ -92,20 +92,11 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+from flask import render_template
+
 @app.route("/")
 def home():
-    return """
-    <h2>🚀 YOLO Object Detection API is Running</h2>
-    <p>Available Endpoints:</p>
-    <ul>
-        <li>/api/health</li>
-        <li>/api/status</li>
-        <li>/api/models</li>
-        <li>/api/detect/image</li>
-        <li>/api/detect/video</li>
-        <li>/api/detect/webcam</li>
-    </ul>
-    """
+    return render_template("index.html")
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
